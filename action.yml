@@ -1,0 +1,33 @@
+name: 'Pagespeed Report for Shopify'
+description: 'Run Pagespeed on a Shopify store and send the report to a Google Cloud Function.'
+inputs:
+  project:
+    description: 'The JIRA project ID.'
+    required: true
+    default: 'CHANGEME'
+  store:
+    description: 'The Shopify store URL.'
+    required: true
+    default: 'changeme.myshopify.com'
+  access_token:
+    description: 'The Shopify access token.'
+    required: true
+  # commit hash to identify the change responsible for this test
+  commit_hash:
+    description: 'The git commit hash.'
+    required: true
+  # branch to group the results
+  branch:
+    description: 'The git branch.'
+    required: true
+  cloud_function_url:
+    description: 'The URL of the Google Cloud Function.'
+    required: true
+  pagespeed_api_key:
+    description: 'The Google PageSpeed Insights API key. This action fetches a comprehensive report including performance, SEO, accessibility, and best-practices scores.'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - run: ${{ github.action_path }}/run.sh
+      shell: bash
