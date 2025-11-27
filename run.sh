@@ -52,10 +52,11 @@ rm "$SA_KEY_FILE"
 # run PageSpeed tests
 run_test() {
   PAGE_TYPE=$1
-  URL=$2
+  DEVICE_TYPE=$2
+  URL=$3
 
   echo
-  echo "Running PageSpeed test for $PAGE_TYPE ($URL)..."
+  echo "Running PageSpeed test for $PAGE_TYPE [$DEVICE_TYPE] ($URL)..."
 
   for i in {1..3}
   do
@@ -72,11 +73,12 @@ run_test() {
     BODY=$(jq -n \
       --arg url "$URL" \
       --arg type "$PAGE_TYPE" \
+      --arg device_type "$DEVICE_TYPE" \
       --arg project "$PROJECT" \
       --arg commit_hash "$COMMIT_HASH" \
       --arg branch "$BRANCH" \
       --arg github_run_id "$GITHUB_RUN_ID" \
-      '{url: $url, page_type: $type, project: $project, commit_hash: $commit_hash, branch: $branch, github_run_id: $github_run_id}')
+      '{url: $url, page_type: $type, device_type: $device_type, project: $project, commit_hash: $commit_hash, branch: $branch, github_run_id: $github_run_id}')
 
     RESPONSE_JSON=""
     if [[ "$DRY_RUN" == "1" ]]; then
@@ -95,14 +97,17 @@ run_test() {
 }
 
 # home page
-run_test "home" "https://$STORE/"
+run_test "home" "desktop" "https://$STORE/"
+run_test "home" "mobile" "https://$STORE/"
 
 # product page
 PRODUCT_URL="$(bash "$SCRIPT_DIR/scripts/get_product_url.sh")"
-run_test "product" "$PRODUCT_URL"
+run_test "product" "mobile" "$PRODUCT_URL"
+run_test "product" "desktop" "$PRODUCT_URL"
 
 # collection page
 COLLECTION_URL="$(bash "$SCRIPT_DIR/scripts/get_collection_url.sh")"
-run_test "category" "$COLLECTION_URL"
+run_test "category" "mobile" "$COLLECTION_URL"
+run_test "category" "desktop" "$COLLECTION_URL"
 
 echo "All PageSpeed tests completed."
