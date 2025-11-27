@@ -48,13 +48,13 @@ gcloud auth activate-service-account --key-file="$SA_KEY_FILE"
 GCLOUD_AUTH_TOKEN=$(gcloud auth print-identity-token)
 rm "$SA_KEY_FILE"
 
-# run Pagespeed tests
+# run PageSpeed tests
 run_test() {
   PAGE_TYPE=$1
   URL=$2
 
   echo
-  echo "Running Pagespeed test for $PAGE_TYPE ($URL)..."
+  echo "Running PageSpeed test for $PAGE_TYPE ($URL)..."
 
   for i in {1..3}
   do
@@ -103,4 +103,4 @@ run_test "product" "$PRODUCT_URL"
 COLLECTION_URL="$(bash "$SCRIPT_DIR/scripts/get_collection_url.sh")"
 run_test "category" "$COLLECTION_URL"
 
-echo "All Pagespeed tests completed."
+echo "All PageSpeed tests completed."

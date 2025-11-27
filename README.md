@@ -23,28 +23,4 @@ This action runs a Pagespeed report on a Shopify store and sends the report to a
 
 ## Example Usage
 
-```yaml
-name: Shopify PageSpeed Report
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  pagespeed:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Run Pagespeed Report
-        uses: ./
-        with:
-          project: 'CHANGEME'
-          store: 'changeme.myshopify.com'
-          access_token: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
-          commit_hash: ${{ github.sha }}
-          branch: ${{ github.ref_name }}
-          sa_key: ${{ secrets.SA_KEY }}
-```
+See `dev/example_github_workflow.yml`.

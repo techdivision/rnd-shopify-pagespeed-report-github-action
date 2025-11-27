@@ -1,5 +1,5 @@
-name: 'Pagespeed Report for Shopify'
-description: 'Run Pagespeed on a Shopify store and send the report to a Google Cloud Function.'
+name: 'PageSpeed Report for Shopify'
+description: 'Run PageSpeed Insights on a Shopify store and send the report to a Google Cloud Function.'
 inputs:
   project:
     description: 'The JIRA project ID.'
