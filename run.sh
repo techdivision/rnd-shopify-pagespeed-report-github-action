@@ -109,8 +109,8 @@ run_test() {
 }
 
 # home page
-run_test "home" "desktop" "https://$STORE/"
 run_test "home" "mobile" "https://$STORE/"
+run_test "home" "desktop" "https://$STORE/"
 
 # product page
 PRODUCT_URL="$(bash "$SCRIPT_DIR/scripts/get_product_url.sh")"
