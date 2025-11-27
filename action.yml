@@ -30,9 +30,9 @@ runs:
       shell: bash
       run: ${{ github.action_path }}/run.sh
       env:
-        BRANCH: ${{ inputs.branch }}
-        COMMIT_HASH: ${{ inputs.commit_hash }}
-        PROJECT: ${{ inputs.project }}
-        STORE: ${{ inputs.store }}
-        ACCESS_TOKEN: ${{ inputs.access_token }}
-        SA_KEY: ${{ inputs.sa_key }}
+        INPUT_BRANCH: ${{ inputs.branch }}
+        INPUT_COMMIT_HASH: ${{ inputs.commit_hash }}
+        INPUT_PROJECT: ${{ inputs.project }}
+        INPUT_STORE: ${{ inputs.store }}
+        INPUT_ACCESS_TOKEN: ${{ inputs.access_token }}
+        INPUT_SA_KEY: ${{ inputs.sa_key }}
