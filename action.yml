@@ -26,5 +26,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - run: ${{ github.action_path }}/run.sh
+    - name: Run PageSpeed script
       shell: bash
+      run: ${{ github.action_path }}/run.sh
+      env:
+        BRANCH: ${{ inputs.branch }}
+        COMMIT_HASH: ${{ inputs.commit_hash }}
+        PROJECT: ${{ inputs.project }}
+        STORE: ${{ inputs.store }}
+        ACCESS_TOKEN: ${{ inputs.access_token }}
+        SA_KEY: ${{ inputs.sa_key }}
