@@ -89,7 +89,7 @@ run_test() {
         -d "$BODY")
     fi
 
-    PERFORMANCE_SCORE=$(echo "$RESPONSE_JSON" | jq '.data.lighthouseResult.categories.performance.score')
+    PERFORMANCE_SCORE=$(echo "$RESPONSE_JSON" | jq -e '.data.lighthouseResult.categories.performance.score' 2>/dev/null || { echo "null"; echo "$RESPONSE_JSON" >&2; })
     echo "   Performance Score: $PERFORMANCE_SCORE"
   done
 }
