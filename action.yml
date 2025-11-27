@@ -30,6 +30,8 @@ runs:
       shell: bash
       run: ${{ github.action_path }}/run.sh
       env:
+        # GitHub Actions Run ID for traceability in downstream systems
+        GITHUB_RUN_ID: ${{ github.run_id }}
         INPUT_BRANCH: ${{ inputs.branch }}
         INPUT_COMMIT_HASH: ${{ inputs.commit_hash }}
         INPUT_PROJECT: ${{ inputs.project }}

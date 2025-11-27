@@ -33,8 +33,9 @@ export COMMIT_HASH="$INPUT_COMMIT_HASH"
 export BRANCH="$INPUT_BRANCH"
 export CLOUD_FUNCTION_URL="https://europe-west3-td-data-warehouse.cloudfunctions.net/td-gcf-pagespeed-metrics-collector"
 export SA_KEY="$INPUT_SA_KEY"
+export GITHUB_RUN_ID="${GITHUB_RUN_ID:-${GITHUB_RUN_ID:-$INPUT_GITHUB_RUN_ID}}"
 
-for VAR_NAME in STORE ACCESS_TOKEN PROJECT COMMIT_HASH BRANCH CLOUD_FUNCTION_URL SA_KEY DRY_RUN; do
+for VAR_NAME in DRY_RUN STORE ACCESS_TOKEN PROJECT COMMIT_HASH BRANCH CLOUD_FUNCTION_URL SA_KEY GITHUB_RUN_ID; do
   printf "[DEBUG] %s=%s\n" "$VAR_NAME" "${!VAR_NAME}"
 done
 
@@ -74,7 +75,8 @@ run_test() {
       --arg project "$PROJECT" \
       --arg commit_hash "$COMMIT_HASH" \
       --arg branch "$BRANCH" \
-      '{url: $url, page_type: $type, project: $project, commit_hash: $commit_hash, branch: $branch}')
+      --arg github_run_id "$GITHUB_RUN_ID" \
+      '{url: $url, page_type: $type, project: $project, commit_hash: $commit_hash, branch: $branch, github_run_id: $github_run_id}')
 
     RESPONSE_JSON=""
     if [[ "$DRY_RUN" == "1" ]]; then
