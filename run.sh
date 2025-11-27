@@ -45,6 +45,7 @@ run_test() {
   PAGE_TYPE=$1
   URL=$2
 
+  echo
   echo "Running Pagespeed test for $PAGE_TYPE ($URL)..."
 
   for i in {1..3}
@@ -69,10 +70,19 @@ run_test() {
       --arg store "$STORE" \
       '{url: $url, type: $type, project: $project, commit_hash: $commit_hash, branch: $branch, store: $store}')
 
-    curl -X POST "$CLOUD_FUNCTION_URL" \
-      -H "Authorization: bearer $GCLOUD_AUTH_TOKEN" \
-      -H "Content-Type: application/json" \
-      -d "$BODY"
+    RESPONSE_JSON=""
+    if [[ "$DRY_RUN" == "1" ]]; then
+      echo "   [DRY_RUN enabled]"
+      RESPONSE_JSON=$(cat dev/example_response.json)
+    else
+      RESPONSE_JSON=$(curl -sS -X POST "$CLOUD_FUNCTION_URL" \
+        -H "Authorization: bearer $GCLOUD_AUTH_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "$BODY")
+    fi
+
+    PERFORMANCE_SCORE=$(echo "$RESPONSE_JSON" | jq '.data.lighthouseResult.categories.performance.score')
+    echo "   Performance Score: $PERFORMANCE_SCORE"
   done
 }
 
