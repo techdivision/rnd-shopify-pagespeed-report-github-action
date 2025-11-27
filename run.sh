@@ -31,9 +31,14 @@ export BRANCH="$INPUT_BRANCH"
 export CLOUD_FUNCTION_URL="https://europe-west3-td-data-warehouse.cloudfunctions.net/td-gcf-pagespeed-metrics-collector"
 export SA_KEY="$INPUT_SA_KEY"
 
+for VAR_NAME in STORE ACCESS_TOKEN PROJECT COMMIT_HASH BRANCH CLOUD_FUNCTION_URL SA_KEY DRY_RUN; do
+  printf "[DEBUG] %s=%s\n" "$VAR_NAME" "${!VAR_NAME}"
+done
+
 # a tmp file for the service account key is needed to authenticate with the cloud function
 SA_KEY_FILE=$(mktemp)
 echo "$SA_KEY" > "$SA_KEY_FILE"
+echo
 gcloud auth activate-service-account --key-file="$SA_KEY_FILE"
 
 # get the gcloud auth token
