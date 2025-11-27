@@ -1,0 +1,24 @@
+name: Lighthouse CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run Lighthouse report
+        uses: techdivision/rnd-shopify-pagespeed-report-github-action@main
+        with:
+          commit_hash: ${{ github.sha }}
+          branch: ${{ github.ref_name }}
+          project: ${{ secrets.JIRA_PROJECT }}
+          store: ${{ secrets.SHOP_STORE_OS2 }}
+          access_token: ${{ secrets.SHOP_ACCESS_TOKEN }}
+          sa_key: ${{ secrets.PAGESPEED_GOOGLE_CLOUD_SA_KEY }}
