@@ -22,6 +22,9 @@ if ! [ -x "$(command -v gcloud)" ]; then
   exit 1
 fi
 
+# set script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # get inputs
 export STORE="$INPUT_STORE"
 export ACCESS_TOKEN="$INPUT_ACCESS_TOKEN"
@@ -95,11 +98,11 @@ run_test() {
 run_test "home" "https://$STORE/"
 
 # product page
-PRODUCT_URL=$(bash "scripts/get_product_url.sh")
+PRODUCT_URL="$(bash "$SCRIPT_DIR/scripts/get_product_url.sh")"
 run_test "product" "$PRODUCT_URL"
 
 # collection page
-COLLECTION_URL=$(bash "scripts/get_collection_url.sh")
+COLLECTION_URL="$(bash "$SCRIPT_DIR/scripts/get_collection_url.sh")"
 run_test "collection" "$COLLECTION_URL"
 
 echo "All Pagespeed tests completed."
