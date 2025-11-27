@@ -64,19 +64,17 @@ run_test() {
 
     # The body of the request should be a JSON object with the following properties:
     # - url: the URL to test
-    # - type: the type of page being tested (e.g. "home", "product", "collection")
+    # - page_type: the type of page being tested (e.g. "home", "product", "collection")
     # - project: the JIRA project ID
     # - commit_hash: the git commit hash
     # - branch: the git branch
-    # - store: the Shopify store URL
     BODY=$(jq -n \
       --arg url "$URL" \
       --arg type "$PAGE_TYPE" \
       --arg project "$PROJECT" \
       --arg commit_hash "$COMMIT_HASH" \
       --arg branch "$BRANCH" \
-      --arg store "$STORE" \
-      '{url: $url, type: $type, project: $project, commit_hash: $commit_hash, branch: $branch, store: $store}')
+      '{url: $url, page_type: $type, project: $project, commit_hash: $commit_hash, branch: $branch}')
 
     RESPONSE_JSON=""
     if [[ "$DRY_RUN" == "1" ]]; then
