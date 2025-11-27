@@ -101,6 +101,6 @@ run_test "product" "$PRODUCT_URL"
 
 # collection page
 COLLECTION_URL="$(bash "$SCRIPT_DIR/scripts/get_collection_url.sh")"
-run_test "collection" "$COLLECTION_URL"
+run_test "category" "$COLLECTION_URL"
 
 echo "All Pagespeed tests completed."
