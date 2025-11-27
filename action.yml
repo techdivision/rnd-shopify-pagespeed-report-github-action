@@ -23,6 +23,10 @@ inputs:
   sa_key:
     description: 'The Google Cloud service account key.'
     required: true
+  runs:
+    description: 'How many times to repeat each PageSpeed test (min 1, max 5).'
+    required: false
+    default: '3'
 runs:
   using: 'composite'
   steps:
@@ -38,3 +42,4 @@ runs:
         INPUT_STORE: ${{ inputs.store }}
         INPUT_ACCESS_TOKEN: ${{ inputs.access_token }}
         INPUT_SA_KEY: ${{ inputs.sa_key }}
+        INPUT_RUNS: ${{ inputs.runs }}

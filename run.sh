@@ -35,7 +35,19 @@ export CLOUD_FUNCTION_URL="https://europe-west3-td-data-warehouse.cloudfunctions
 export SA_KEY="$INPUT_SA_KEY"
 export GITHUB_RUN_ID="${GITHUB_RUN_ID:-${GITHUB_RUN_ID:-$INPUT_GITHUB_RUN_ID}}"
 
-for VAR_NAME in DRY_RUN STORE ACCESS_TOKEN PROJECT COMMIT_HASH BRANCH CLOUD_FUNCTION_URL SA_KEY GITHUB_RUN_ID; do
+# determine number of runs (default 3). Enforce 1..5
+RAW_RUNS="${RUNS:-${INPUT_RUNS:-3}}"
+if ! [[ "$RAW_RUNS" =~ ^[0-9]+$ ]]; then
+  RAW_RUNS=3
+fi
+if [ "$RAW_RUNS" -lt 1 ]; then
+  RAW_RUNS=1
+elif [ "$RAW_RUNS" -gt 5 ]; then
+  RAW_RUNS=5
+fi
+export RUNS="$RAW_RUNS"
+
+for VAR_NAME in DRY_RUN STORE ACCESS_TOKEN PROJECT COMMIT_HASH BRANCH CLOUD_FUNCTION_URL SA_KEY GITHUB_RUN_ID INPUT_RUNS RUNS; do
   printf "[DEBUG] %s=%s\n" "$VAR_NAME" "${!VAR_NAME}"
 done
 
@@ -58,9 +70,9 @@ run_test() {
   echo
   echo "Running PageSpeed test for $PAGE_TYPE [$DEVICE_TYPE] ($URL)..."
 
-  for i in {1..3}
+  for i in $(seq 1 "$RUNS")
   do
-    echo "  Run $i of 3..."
+    echo "  Run $i of $RUNS..."
 
     export URL
 
