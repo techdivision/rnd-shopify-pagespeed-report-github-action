@@ -13,9 +13,7 @@ This action runs a Pagespeed report on a Shopify store and sends the report to a
 - `project`: The Google Cloud project ID. (required)
 - `commit_hash`: The git commit hash. (required)
 - `branch`: The git branch. (required)
-- `cloud_function_url`: The URL of the Google Cloud Function. (required)
-- `pagespeed_api_key`: The Google PageSpeed Insights API key. (required) This action fetches a comprehensive report
-  including performance, SEO, accessibility, and best-practices scores.
+- `sa_key`: The Google Cloud service account key. (required)
 
 ## Local test
 
@@ -26,7 +24,7 @@ This action runs a Pagespeed report on a Shopify store and sends the report to a
 ## Example Usage
 
 ```yaml
-name: Pagespeed Report
+name: Shopify PageSpeed Report
 
 on:
   push:
@@ -48,6 +46,5 @@ jobs:
           access_token: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
           commit_hash: ${{ github.sha }}
           branch: ${{ github.ref_name }}
-          cloud_function_url: ${{ secrets.PAGESPEED_CLOUD_FUNCTION_URL }}
-          pagespeed_api_key: ${{ secrets.PAGESPEED_API_KEY }}
+          sa_key: ${{ secrets.SA_KEY }}
 ```

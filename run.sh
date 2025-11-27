@@ -16,17 +16,31 @@ if ! [ -x "$(command -v jq)" ]; then
   exit 1
 fi
 
+# check if gcloud is installed
+if ! [ -x "$(command -v gcloud)" ]; then
+  echo 'Error: gcloud is not installed. Please add a step to install gcloud in your workflow.' >&2
+  exit 1
+fi
+
 # get inputs
 export STORE="$INPUT_STORE"
 export ACCESS_TOKEN="$INPUT_ACCESS_TOKEN"
 export PROJECT="$INPUT_PROJECT"
 export COMMIT_HASH="$INPUT_COMMIT_HASH"
 export BRANCH="$INPUT_BRANCH"
-export CLOUD_FUNCTION_URL="$INPUT_CLOUD_FUNCTION_URL"
-export PAGESPEED_API_KEY="$INPUT_PAGESPEED_API_KEY"
+export CLOUD_FUNCTION_URL="https://europe-west3-td-data-warehouse.cloudfunctions.net/td-gcf-pagespeed-metrics-collector"
+export SA_KEY="$INPUT_SA_KEY"
+
+# a tmp file for the service account key is needed to authenticate with the cloud function
+SA_KEY_FILE=$(mktemp)
+echo "$SA_KEY" > "$SA_KEY_FILE"
+gcloud auth activate-service-account --key-file="$SA_KEY_FILE"
+
+# get the gcloud auth token
+GCLOUD_AUTH_TOKEN=$(gcloud auth print-identity-token)
+rm "$SA_KEY_FILE"
 
 # run Pagespeed tests
-
 run_test() {
   PAGE_TYPE=$1
   URL=$2
@@ -39,19 +53,26 @@ run_test() {
 
     export URL
 
-    DRY_RUN=false
-    TEMP_FILE=$(mktemp)
-    if [ "$DRY_RUN" = true ]; then
-        cp tmp/last_response.json "$TEMP_FILE"
-    else
-        bash "scripts/call_pagespeed.sh" > "$TEMP_FILE"
-        cp "$TEMP_FILE" tmp/last_response.json
-    fi
+    # The body of the request should be a JSON object with the following properties:
+    # - url: the URL to test
+    # - type: the type of page being tested (e.g. "home", "product", "collection")
+    # - project: the JIRA project ID
+    # - commit_hash: the git commit hash
+    # - branch: the git branch
+    # - store: the Shopify store URL
+    BODY=$(jq -n \
+      --arg url "$URL" \
+      --arg type "$PAGE_TYPE" \
+      --arg project "$PROJECT" \
+      --arg commit_hash "$COMMIT_HASH" \
+      --arg branch "$BRANCH" \
+      --arg store "$STORE" \
+      '{url: $url, type: $type, project: $project, commit_hash: $commit_hash, branch: $branch, store: $store}')
 
-    export PAGE_TYPE
-    bash "scripts/send_report.sh" < "$TEMP_FILE"
-
-    rm "$TEMP_FILE"
+    curl -X POST "$CLOUD_FUNCTION_URL" \
+      -H "Authorization: bearer $GCLOUD_AUTH_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d "$BODY"
   done
 }
 

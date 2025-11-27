@@ -23,8 +23,8 @@ inputs:
   cloud_function_url:
     description: 'The URL of the Google Cloud Function.'
     required: true
-  pagespeed_api_key:
-    description: 'The Google PageSpeed Insights API key. This action fetches a comprehensive report including performance, SEO, accessibility, and best-practices scores.'
+  sa_key:
+    description: 'The Google Cloud service account key.'
     required: true
 runs:
   using: 'composite'
