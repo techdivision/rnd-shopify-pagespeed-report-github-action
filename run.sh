@@ -81,7 +81,7 @@ run_test() {
     RESPONSE_JSON=""
     if [[ "$DRY_RUN" == "1" ]]; then
       echo "   [DRY_RUN enabled]"
-      RESPONSE_JSON=$(cat dev/example_response.json)
+      RESPONSE_JSON=$(cat "$SCRIPT_DIR"/dev/example_response.json)
     else
       RESPONSE_JSON=$(curl -sS -X POST "$CLOUD_FUNCTION_URL" \
         -H "Authorization: bearer $GCLOUD_AUTH_TOKEN" \
