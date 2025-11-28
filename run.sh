@@ -51,6 +51,9 @@ for VAR_NAME in DRY_RUN STORE ACCESS_TOKEN PROJECT COMMIT_HASH BRANCH CLOUD_FUNC
   printf "[DEBUG] %s=%s\n" "$VAR_NAME" "${!VAR_NAME}"
 done
 
+# track if any request failed (non-200 or curl error) to set final exit code
+ERROR_OCCURRED=0
+
 # a tmp file for the service account key is needed to authenticate with the cloud function
 SA_KEY_FILE=$(mktemp)
 echo "$SA_KEY" > "$SA_KEY_FILE"
@@ -97,10 +100,23 @@ run_test() {
       echo "   [DRY_RUN enabled]"
       RESPONSE_JSON=$(cat "$SCRIPT_DIR"/dev/example_response.json)
     else
-      RESPONSE_JSON=$(curl -sS -X POST "$CLOUD_FUNCTION_URL" \
+      TMP_BODY_FILE=$(mktemp)
+      # allow curl to fail without stopping the script, we'll handle status/exit
+      set +e
+      HTTP_STATUS=$(curl -sS -X POST "$CLOUD_FUNCTION_URL" \
         -H "Authorization: bearer $GCLOUD_AUTH_TOKEN" \
         -H "Content-Type: application/json" \
-        -d "$BODY")
+        -d "$BODY" \
+        -o "$TMP_BODY_FILE" -w "%{http_code}")
+      CURL_EXIT=$?
+      set -e
+      RESPONSE_JSON=$(cat "$TMP_BODY_FILE" 2>/dev/null || echo "")
+      rm -f "$TMP_BODY_FILE"
+
+      if [ "$CURL_EXIT" -ne 0 ] || [ "$HTTP_STATUS" != "200" ]; then
+        echo "   [WARN] Request failed (curl_exit=$CURL_EXIT http_status=$HTTP_STATUS)" >&2
+        ERROR_OCCURRED=1
+      fi
     fi
 
     PERFORMANCE_SCORE=$(echo "$RESPONSE_JSON" | jq -e '.data.lighthouseResult.categories.performance.score' 2>/dev/null || { echo "null"; echo "$RESPONSE_JSON" >&2; })
@@ -122,4 +138,10 @@ COLLECTION_URL="$(bash "$SCRIPT_DIR/scripts/get_collection_url.sh")"
 run_test "category" "mobile" "$COLLECTION_URL"
 run_test "category" "desktop" "$COLLECTION_URL"
 
-echo "All PageSpeed tests completed."
+echo "All PageSpeed tests ran."
+
+# if any request did not return HTTP 200 or curl errored, fail the script at the end
+if [ "$ERROR_OCCURRED" -ne 0 ]; then
+  echo "One or more requests failed (non-200 or curl error). Failing the job." >&2
+  exit 1
+fi
