@@ -75,7 +75,7 @@ run_test() {
 
   for i in $(seq 1 "$RUNS")
   do
-    echo "  Run $i of $RUNS..."
+    echo "  Run $i of $RUNS at $(date '+%Y-%m-%d %H:%M:%S')..."
 
     export URL
 
@@ -121,6 +121,9 @@ run_test() {
 
     PERFORMANCE_SCORE=$(echo "$RESPONSE_JSON" | jq -e '.data.lighthouseResult.categories.performance.score' 2>/dev/null || { echo "null"; echo "$RESPONSE_JSON" >&2; })
     echo "   Performance Score: $PERFORMANCE_SCORE"
+
+    # wait 3 seconds between runs
+    sleep 3
   done
 }
 
