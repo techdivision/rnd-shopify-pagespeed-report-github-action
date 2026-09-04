@@ -31,8 +31,10 @@ export ACCESS_TOKEN="$INPUT_ACCESS_TOKEN"
 export PROJECT="$INPUT_PROJECT"
 export COMMIT_HASH="$INPUT_COMMIT_HASH"
 export BRANCH="$INPUT_BRANCH"
-export CLOUD_FUNCTION_URL="https://europe-west3-td-data-warehouse.cloudfunctions.net/td-gcf-pagespeed-metrics-collector"
-export SA_KEY="$INPUT_SA_KEY"
+export CLOUD_FUNCTION_URL="https://europe-west3-td-pagespeed-metrics.cloudfunctions.net/td-gcf-pagespeed-metrics-collector"
+# Identity token comes from the auth step in action.yml (Workload Identity
+# Federation). No service account key is involved any more.
+export ID_TOKEN="${ID_TOKEN:-}"
 export GITHUB_RUN_ID="${GITHUB_RUN_ID:-${GITHUB_RUN_ID:-$INPUT_GITHUB_RUN_ID}}"
 
 # determine number of runs (default 3). Enforce 1..5
@@ -47,22 +49,26 @@ elif [ "$RAW_RUNS" -gt 5 ]; then
 fi
 export RUNS="$RAW_RUNS"
 
-for VAR_NAME in DRY_RUN STORE ACCESS_TOKEN PROJECT COMMIT_HASH BRANCH CLOUD_FUNCTION_URL SA_KEY GITHUB_RUN_ID RUNS; do
+# ID_TOKEN is deliberately absent from this list - never print a bearer token.
+for VAR_NAME in DRY_RUN STORE PROJECT COMMIT_HASH BRANCH CLOUD_FUNCTION_URL GITHUB_RUN_ID RUNS; do
   printf "[DEBUG] %s=%s\n" "$VAR_NAME" "${!VAR_NAME}"
 done
 
 # track if any request failed (non-200 or curl error) to set final exit code
 ERROR_OCCURRED=0
 
-# a tmp file for the service account key is needed to authenticate with the cloud function
-SA_KEY_FILE=$(mktemp)
-echo "$SA_KEY" > "$SA_KEY_FILE"
-echo
-gcloud auth activate-service-account --key-file="$SA_KEY_FILE"
-
-# get the gcloud auth token
-GCLOUD_AUTH_TOKEN=$(gcloud auth print-identity-token)
-rm "$SA_KEY_FILE"
+# Authentication happens in action.yml via Workload Identity Federation: the
+# auth step exchanges GitHub's OIDC token for a short-lived identity token and
+# hands it over as ID_TOKEN. Nothing to do here except check it arrived.
+#
+# The token identifies the CALLING repository, not this action - that is why
+# each shop repo needs its own entry in the WIF allowlist, and why this repo
+# needs none.
+if [ -z "$ID_TOKEN" ]; then
+  echo "Error: ID_TOKEN is empty. The auth step in action.yml did not run or failed." >&2
+  echo "       Check that the calling workflow grants 'id-token: write' on job level." >&2
+  exit 1
+fi
 
 # run PageSpeed tests
 run_test() {
@@ -104,7 +110,7 @@ run_test() {
       # allow curl to fail without stopping the script, we'll handle status/exit
       set +e
       HTTP_STATUS=$(curl -sS -X POST "$CLOUD_FUNCTION_URL" \
-        -H "Authorization: bearer $GCLOUD_AUTH_TOKEN" \
+        -H "Authorization: Bearer $ID_TOKEN" \
         -H "Content-Type: application/json" \
         -d "$BODY" \
         -o "$TMP_BODY_FILE" -w "%{http_code}")

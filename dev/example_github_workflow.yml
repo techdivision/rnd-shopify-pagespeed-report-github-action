@@ -2,13 +2,19 @@ name: Performance tests (GCP)
 
 on:
   schedule:
-    - cron: '0 3 * * *' # run daily at 3 a.m. UTC
+    - cron: '0 4 * * *' # run daily at 4 a.m. UTC
   workflow_dispatch:
 
 jobs:
   pagespeed:
     name: PageSpeed Google Cloud Function
     runs-on: ubuntu-latest
+    # Required for Workload Identity Federation. A composite action cannot grant
+    # this to itself, so it has to be here.
+    # Never add id-token: write to a pull_request workflow.
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -21,4 +27,3 @@ jobs:
           project: ${{ secrets.JIRA_PROJECT }}
           store: ${{ secrets.SHOP_STORE_OS2 }}
           access_token: ${{ secrets.SHOP_ACCESS_TOKEN }}
-          sa_key: ${{ secrets.PAGESPEED_GOOGLE_CLOUD_SA_KEY }}

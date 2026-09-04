@@ -20,9 +20,6 @@ inputs:
   branch:
     description: 'The git branch.'
     required: true
-  sa_key:
-    description: 'The Google Cloud service account key.'
-    required: true
   runs:
     description: 'How many times to repeat each PageSpeed test (min 1, max 5).'
     required: false
@@ -30,6 +27,24 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    # Workload Identity Federation instead of a service account key.
+    # GitHub's OIDC token is exchanged for a short-lived identity token; no
+    # long-lived credential is stored anywhere.
+    #
+    # The OIDC token identifies the CALLING repository, not this action, so
+    # every shop repo must be on the WIF allowlist and must grant
+    # 'id-token: write' on job level. This action repo needs neither.
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        project_id: td-pagespeed-metrics
+        workload_identity_provider: projects/724978094750/locations/global/workloadIdentityPools/github-pool/providers/github-oidc
+        service_account: sa-github-invoker@td-pagespeed-metrics.iam.gserviceaccount.com
+        token_format: id_token
+        id_token_audience: https://europe-west3-td-pagespeed-metrics.cloudfunctions.net/td-gcf-pagespeed-metrics-collector
+        id_token_include_email: true
+
     - name: Run PageSpeed script
       shell: bash
       run: ${{ github.action_path }}/run.sh
@@ -41,5 +56,6 @@ runs:
         INPUT_PROJECT: ${{ inputs.project }}
         INPUT_STORE: ${{ inputs.store }}
         INPUT_ACCESS_TOKEN: ${{ inputs.access_token }}
-        INPUT_SA_KEY: ${{ inputs.sa_key }}
         INPUT_RUNS: ${{ inputs.runs }}
+        # Passed via env, never interpolated into the script text
+        ID_TOKEN: ${{ steps.auth.outputs.id_token }}
