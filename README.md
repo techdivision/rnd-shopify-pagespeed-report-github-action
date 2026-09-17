@@ -8,8 +8,13 @@ This action runs a Pagespeed report on a Shopify store and sends the report to a
 
 ## Inputs
 
-- `store`: The Shopify store URL. (required)
-- `access_token`: The Shopify access token. (required)
+- `store`: The Shopify store domain, e.g. `acme-de.myshopify.com`. A bare shop handle such as
+  `acme-de` is accepted too and gets `.myshopify.com` appended; a full URL is stripped down to
+  the host. Use the `myshopify.com` domain, not a custom domain — the Admin API only answers
+  on the former. (required)
+- `access_token`: The Shopify Admin API access token, needs read access to products and
+  collections. Optional: if it is empty, `0` or `unknown`, the product and collection tests
+  are skipped and only the home page is measured. (optional)
 - `project`: The JIRA project key, used as the `project` dimension in reporting. (required)
 - `commit_hash`: The git commit hash. (required)
 - `branch`: The git branch. (required)

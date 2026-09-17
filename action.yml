@@ -6,12 +6,13 @@ inputs:
     required: true
     default: 'CHANGEME'
   store:
-    description: 'The Shopify store URL.'
+    description: 'The Shopify store domain. A bare shop handle gets .myshopify.com appended.'
     required: true
     default: 'changeme.myshopify.com'
   access_token:
-    description: 'The Shopify access token.'
-    required: true
+    description: 'The Shopify access token. Without it only the home page is measured.'
+    required: false
+    default: ''
   # commit hash to identify the change responsible for this test
   commit_hash:
     description: 'The git commit hash.'

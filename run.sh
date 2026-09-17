@@ -49,8 +49,37 @@ elif [ "$RAW_RUNS" -gt 5 ]; then
 fi
 export RUNS="$RAW_RUNS"
 
+# normalize the store domain. Accepts a bare shop handle ("acme-de"), a full
+# domain ("acme-de.myshopify.com") or a URL ("https://acme-de.myshopify.com/").
+# A value without a dot is treated as a handle and gets the myshopify suffix,
+# otherwise PageSpeed would be pointed at a hostname that does not resolve.
+STORE="${STORE#http://}"
+STORE="${STORE#https://}"
+STORE="${STORE%%/*}"
+if [ -z "$STORE" ]; then
+  echo "Error: STORE is empty. Pass the 'store' input to the action." >&2
+  exit 1
+fi
+if [[ "$STORE" != *.* ]]; then
+  echo "[INFO] STORE '$STORE' is not a domain, treating it as a shop handle and appending .myshopify.com"
+  STORE="$STORE.myshopify.com"
+fi
+export STORE
+
+# The access token is optional. It is only needed to look up a product and a
+# collection handle through the Admin API. Without a usable token those two
+# page types are skipped and only the home page is measured. Placeholder values
+# that shops use for "not configured" count as no token.
+HAS_ACCESS_TOKEN=1
+case "$(printf '%s' "$ACCESS_TOKEN" | tr '[:upper:]' '[:lower:]')" in
+  ""|'""'|"''"|"0"|"unknown"|"null"|"none")
+    HAS_ACCESS_TOKEN=0
+    ;;
+esac
+export HAS_ACCESS_TOKEN
+
 # ID_TOKEN is deliberately absent from this list - never print a bearer token.
-for VAR_NAME in DRY_RUN STORE PROJECT COMMIT_HASH BRANCH CLOUD_FUNCTION_URL GITHUB_RUN_ID RUNS; do
+for VAR_NAME in DRY_RUN STORE PROJECT COMMIT_HASH BRANCH CLOUD_FUNCTION_URL GITHUB_RUN_ID RUNS HAS_ACCESS_TOKEN; do
   printf "[DEBUG] %s=%s\n" "$VAR_NAME" "${!VAR_NAME}"
 done
 
@@ -137,15 +166,22 @@ run_test() {
 run_test "home" "mobile" "https://$STORE/"
 run_test "home" "desktop" "https://$STORE/"
 
-# product page
-PRODUCT_URL="$(bash "$SCRIPT_DIR/scripts/get_product_url.sh")"
-run_test "product" "mobile" "$PRODUCT_URL"
-run_test "product" "desktop" "$PRODUCT_URL"
+# product and collection page. Both handles come from the Admin API, so they
+# are only reachable with an access token.
+if [ "$HAS_ACCESS_TOKEN" -eq 1 ]; then
+  # product page
+  PRODUCT_URL="$(bash "$SCRIPT_DIR/scripts/get_product_url.sh")"
+  run_test "product" "mobile" "$PRODUCT_URL"
+  run_test "product" "desktop" "$PRODUCT_URL"
 
-# collection page
-COLLECTION_URL="$(bash "$SCRIPT_DIR/scripts/get_collection_url.sh")"
-run_test "category" "mobile" "$COLLECTION_URL"
-run_test "category" "desktop" "$COLLECTION_URL"
+  # collection page
+  COLLECTION_URL="$(bash "$SCRIPT_DIR/scripts/get_collection_url.sh")"
+  run_test "category" "mobile" "$COLLECTION_URL"
+  run_test "category" "desktop" "$COLLECTION_URL"
+else
+  echo
+  echo "[INFO] No usable access token, skipping product and collection tests. Only the home page was measured."
+fi
 
 echo "All PageSpeed tests ran."
 
