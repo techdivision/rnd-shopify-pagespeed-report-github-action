@@ -1,0 +1,57 @@
+{
+  "mcpServers": {
+    "atlassian": {
+      "type": "http",
+      "url": "https://mcp.atlassian.com/v2/mcp"
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest"
+      ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "google-workspace-mcp": {
+      "type": "http",
+      "url": "https://google-workspace.mcp-server.tdservice.net/mcp"
+    },
+    "mermaid-file-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@peng-shawn/mermaid-mcp-server"
+      ],
+      "env": {
+        "CONTENT_IMAGE_SUPPORTED": "false"
+      }
+    },
+    "notebooklm": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "notebooklm-mcp-cli",
+        "notebooklm-mcp"
+      ],
+      "env": {
+        "NOTEBOOKLM_QUERY_TIMEOUT": "300"
+      }
+    },
+    "shopify-dev": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@shopify/dev-mcp@latest"
+      ],
+      "env": {
+        "LIQUID": "true"
+      }
+    }
+  }
+}

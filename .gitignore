@@ -1,3 +1,13 @@
+# >>> techdivision ai-setup (managed, do not edit inside) >>>
+# allow more below this block, e.g. !/.claude/rules/
+/.claude/*
+!/.claude/settings.json
+/.opencode/*
+!/.opencode/opencode.json
+/.ai/*
+!/.ai/.config_sync_key
+# <<< techdivision ai-setup <<<
+
 # Created by https://www.toptal.com/developers/gitignore/api/phpstorm,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=phpstorm,macos
 

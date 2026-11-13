@@ -1,0 +1,112 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "guidelines/*.md"
+  ],
+  "plugin": [
+    "@techdivision/opencode-plugin-docx",
+    "@techdivision/opencode-plugin-git-flow",
+    "@techdivision/opencode-plugin-marketing",
+    "@techdivision/opencode-plugin-pm",
+    "@techdivision/opencode-plugin-shared",
+    "@techdivision/opencode-plugin-shopify-theme"
+  ],
+  "permission": {
+    "external_directory": {
+      "~/time_tracking/**": "allow"
+    }
+  },
+  "agent": {
+    "time-tracking": {
+      "model": "techdivision/gemma4:latest"
+    }
+  },
+  "mcp": {
+    "atlassian": {
+      "type": "remote",
+      "url": "https://mcp.atlassian.com/v2/mcp",
+      "enabled": true
+    },
+    "chrome-devtools": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "chrome-devtools-mcp@latest"
+      ],
+      "enabled": true
+    },
+    "context7": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "enabled": true
+    },
+    "google-workspace-mcp": {
+      "type": "remote",
+      "url": "https://google-workspace.mcp-server.tdservice.net/mcp",
+      "enabled": true
+    },
+    "mermaid-file-server": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@peng-shawn/mermaid-mcp-server"
+      ],
+      "environment": {
+        "CONTENT_IMAGE_SUPPORTED": "false"
+      },
+      "enabled": true
+    },
+    "notebooklm": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "--from",
+        "notebooklm-mcp-cli",
+        "notebooklm-mcp"
+      ],
+      "environment": {
+        "NOTEBOOKLM_QUERY_TIMEOUT": "300"
+      },
+      "enabled": true
+    },
+    "shopify-dev": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@shopify/dev-mcp@latest"
+      ],
+      "environment": {
+        "LIQUID": "true"
+      },
+      "enabled": true
+    }
+  },
+  "provider": {
+    "techdivision": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "TechDivision",
+      "options": {
+        "baseURL": "https://openwebui.ai.tdservice.net/api/v1",
+        "apiKey": "{env:TT_AGENT_API_KEY}"
+      },
+      "models": {
+        "mistral:latest": {
+          "name": "Mistral"
+        },
+        "llama3:latest": {
+          "name": "Llama3"
+        },
+        "gemma4:latest": {
+          "name": "Gemma4"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "TEAM_AUTOSTART": "off"
+  },
+  "permissions": {
+    "allow": [
+      "Artifact",
+      "mcp__atlassian__get*",
+      "mcp__atlassian__search*",
+      "mcp__atlassian__fetch",
+      "mcp__atlassian__lookupJiraAccountId",
+      "mcp__atlassian__atlassianUserInfo",
+      "mcp__chrome-devtools__get_*",
+      "mcp__chrome-devtools__list_*",
+      "mcp__chrome-devtools__take_*",
+      "mcp__chrome-devtools__performance_analyze_insight",
+      "mcp__context7__*",
+      "mcp__mermaid-file-server__generate",
+      "mcp__google-workspace-mcp__get_*",
+      "mcp__google-workspace-mcp__list_*",
+      "mcp__google-workspace-mcp__search_*",
+      "mcp__google-workspace-mcp__read_*",
+      "mcp__google-workspace-mcp__check_*",
+      "mcp__google-workspace-mcp__debug_*",
+      "mcp__google-workspace-mcp__inspect_*",
+      "mcp__notebooklm__notebook_list",
+      "mcp__notebooklm__notebook_get",
+      "mcp__notebooklm__notebook_describe",
+      "mcp__notebooklm__source_describe",
+      "mcp__notebooklm__source_get_content",
+      "mcp__notebooklm__source_list_drive",
+      "mcp__notebooklm__notebook_query",
+      "mcp__notebooklm__notebook_query_start",
+      "mcp__notebooklm__notebook_query_status",
+      "mcp__notebooklm__cross_notebook_query",
+      "mcp__notebooklm__studio_status",
+      "mcp__notebooklm__research_status",
+      "mcp__notebooklm__notebook_share_status",
+      "mcp__notebooklm__server_info",
+      "mcp__notebooklm__download_artifact",
+      "mcp__notebooklm__export_artifact"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git push * -f)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(git branch -D*)",
+      "Bash(git branch --delete --force*)",
+      "Bash(sudo rm -rf*)",
+      "mcp__google-workspace-mcp__set_publish_settings",
+      "mcp__notebooklm__notebook_share_public"
+    ],
+    "ask": [
+      "Bash(rm -rf*)",
+      "mcp__atlassian__add*",
+      "mcp__atlassian__create*",
+      "mcp__atlassian__edit*",
+      "mcp__atlassian__update*",
+      "mcp__atlassian__transition*",
+      "mcp__google-workspace-mcp__create_*",
+      "mcp__google-workspace-mcp__update_*",
+      "mcp__google-workspace-mcp__modify_*",
+      "mcp__google-workspace-mcp__batch_*",
+      "mcp__google-workspace-mcp__insert_*",
+      "mcp__google-workspace-mcp__reply_*",
+      "mcp__google-workspace-mcp__resolve_*",
+      "mcp__google-workspace-mcp__move_*",
+      "mcp__google-workspace-mcp__manage_*",
+      "mcp__google-workspace-mcp__delete_*",
+      "mcp__google-workspace-mcp__draft_*",
+      "mcp__google-workspace-mcp__clear_*",
+      "mcp__google-workspace-mcp__send_*",
+      "mcp__google-workspace-mcp__find_and_replace_doc",
+      "mcp__google-workspace-mcp__export_doc_to_pdf",
+      "mcp__notebooklm__notebook_delete",
+      "mcp__notebooklm__source_delete",
+      "mcp__notebooklm__studio_delete",
+      "mcp__notebooklm__notebook_share_batch",
+      "mcp__notebooklm__notebook_share_invite"
+    ]
+  },
+  "model": "opus",
+  "enabledPlugins": {
+    "agent-rules@techdivision-marketplace": true,
+    "core@techdivision-marketplace": true,
+    "docx@techdivision-marketplace": true,
+    "git-flow@techdivision-marketplace": true,
+    "marketing@techdivision-marketplace": true,
+    "pm@techdivision-marketplace": true,
+    "shared@techdivision-marketplace": true,
+    "shopify-plugin@shopify-ai-toolkit": true,
+    "shopify-theme@techdivision-marketplace": true
+  },
+  "enabledMcpjsonServers": [
+    "atlassian",
+    "chrome-devtools",
+    "context7",
+    "google-workspace-mcp",
+    "mermaid-file-server",
+    "notebooklm",
+    "shopify-dev"
+  ],
+  "extraKnownMarketplaces": {
+    "shopify-ai-toolkit": {
+      "source": {
+        "source": "github",
+        "repo": "Shopify/shopify-ai-toolkit"
+      }
+    },
+    "techdivision-marketplace": {
+      "source": {
+        "source": "git",
+        "url": "git@git.tdservice.cloud:opencode/plugin-marketplace.git"
+      },
+      "autoUpdate": true
+    }
+  },
+  "skipAutoPermissionPrompt": true
+}
